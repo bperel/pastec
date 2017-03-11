@@ -49,8 +49,9 @@ u_int32_t ORBFeatureExtractor::processNewImage(unsigned i_imageId, unsigned i_im
 
     vector<KeyPoint> keypoints;
     Mat descriptors;
-
-    ORB(2000, 1.02, 100)(img, noArray(), keypoints, descriptors);
+    
+    cv::Ptr<cv::ORB> orb = cv::ORB::create(2000, 1.02, 100);
+    orb->detectAndCompute(img, noArray(), keypoints, descriptors);
     i_nbFeaturesExtracted = keypoints.size();
 
     unsigned i_nbKeyPoints = 0;

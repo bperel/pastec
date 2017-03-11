@@ -102,8 +102,10 @@ int HTTPServer::run()
                                   NULL, MHD_OPTION_END);
     }
 
-    if (daemon == NULL)
+    if (daemon == NULL) {
+    	cout << "error" << endl;
         return ERROR_GENERIC;
+    }
 
     cout << "Ready to accept queries." << endl;
 

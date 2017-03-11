@@ -118,6 +118,7 @@ int main(int argc, char** argv)
     signal(SIGHUP, intHandler);
     signal(SIGINT, intHandler);
 
+    cout << "starting" << endl;
     s->run();
 
     cout << "Terminating Pastec." << endl;

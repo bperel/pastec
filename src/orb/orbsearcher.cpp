@@ -124,12 +124,13 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
     vector<KeyPoint> keypoints;
     Mat descriptors;
 
-    ORB(2000, 1.02, 100)(img, noArray(), keypoints, descriptors);
+    cv::Ptr<cv::ORB> orb = cv::ORB::create(2000, 1.02, 100);
+    orb->detectAndCompute(img, noArray(), keypoints, descriptors);
 
     gettimeofday(&t[1], NULL);
 
     cout << "time: " << getTimeDiff(t[0], t[1]) << " ms." << endl;
-    cout << "Looking for the visual words. " << endl;
+    cout << "Looking for the visual words. " << descriptors.rows << " " << descriptors.cols << endl;
 
     const unsigned i_nbTotalIndexedImages = index->getTotalNbIndexedImages();
     const unsigned i_maxNbOccurences = i_nbTotalIndexedImages > 10000 ?
@@ -282,7 +283,7 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
 
     gettimeofday(&t[6], NULL);
     cout << "time: " << getTimeDiff(t[5], t[6]) << " ms." << endl;
-    cout << "Returning the results. " << endl;
+    cout << "Returning the results. " << rerankedResults.size() << endl;
 
     returnResults(rerankedResults, request, 100);
 

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 project(Pastec)
-
+#export PKG_CONFIG_PATH=/usr/lib64/pkgconfig:/usr/lib/pkgconfig:/usr/local/lib/pkgconfig
 include_directories(include include/orb)
 
 set(SOURCES      src/main.cpp

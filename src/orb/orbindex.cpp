@@ -375,6 +375,7 @@ u_int32_t ORBIndex::write(string backwardIndexPath)
 
     ofstream ofs;
 
+    cout << "opening" << backwardIndexPath <<  endl;
     ofs.open(backwardIndexPath.c_str(), ios_base::binary);
     if (!ofs.good())
     {

@@ -33,7 +33,7 @@ ORBWordIndex::ORBWordIndex(string visualWordsPath)
         exit(1);
     assert(words->rows == 1000000);
 
-    cout << "Building the word index." << endl;
+    cout << "Building the word index." << words->rows << " " << words->cols << endl;
 
     cvflann::Matrix<unsigned char> m_features
             ((unsigned char*)words->ptr<unsigned char>(0), words->rows, words->cols);
@@ -94,6 +94,9 @@ bool ORBWordIndex::readVisualWords(string fileName)
         if (!ifs.good())
             break;
         words->push_back(line);
+	if(words->rows == 1000000) {
+		break;
+	}
     }
 
     ifs.close();
