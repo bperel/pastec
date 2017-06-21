@@ -113,7 +113,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
     timeval t[3];
     gettimeofday(&t[0], NULL);
 
-    cout << "Loading the image and extracting the ORBs." << endl;
+    cout << currentDate() << "Loading the image and extracting the ORBs." << endl;
 
     Mat img;
     u_int32_t i_ret = ImageLoader::loadImage(request.imageData.size(),
@@ -129,8 +129,8 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
 
     gettimeofday(&t[1], NULL);
 
-    cout << "time: " << getTimeDiff(t[0], t[1]) << " ms." << endl;
-    cout << "Looking for the visual words. " << descriptors.rows << " " << descriptors.cols << endl;
+    cout << currentDate() << "time: " << getTimeDiff(t[0], t[1]) << " ms." << endl;
+    cout << currentDate() << "Looking for the visual words. " << descriptors.rows << " " << descriptors.cols << endl;
 
     const unsigned i_nbTotalIndexedImages = index->getTotalNbIndexedImages();
     const unsigned i_maxNbOccurences = i_nbTotalIndexedImages > 10000 ?
@@ -169,7 +169,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
     }
 
     gettimeofday(&t[2], NULL);
-    cout << "time: " << getTimeDiff(t[1], t[2]) << " ms." << endl;
+    cout << currentDate() << "time: " << getTimeDiff(t[1], t[2]) << " ms." << endl;
 
     return processSimilar(request, imageReqHits);
 }
@@ -184,7 +184,7 @@ u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
     timeval t[2];
     gettimeofday(&t[0], NULL);
 
-    cout << "Loading the image words from the index." << endl;
+    cout << currentDate() << "Loading the image words from the index." << endl;
 
     // key: visual word, value: the found angles
     std::unordered_map<u_int32_t, list<Hit> > imageReqHits;
@@ -194,7 +194,7 @@ u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
         return i_ret;
 
     gettimeofday(&t[1], NULL);
-    cout << "time: " << getTimeDiff(t[0], t[1]) << " ms." << endl;
+    cout << currentDate() << "time: " << getTimeDiff(t[0], t[1]) << " ms." << endl;
 
     return processSimilar(request, imageReqHits);
 }
@@ -208,16 +208,16 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
 
     const unsigned i_nbTotalIndexedImages = index->getTotalNbIndexedImages();
 
-    cout << imageReqHits.size() << " visual words kept for the request." << endl;
-    cout << i_nbTotalIndexedImages << " images indexed in the index." << endl;
+    cout << currentDate() << imageReqHits.size() << " visual words kept for the request." << endl;
+    cout << currentDate() << i_nbTotalIndexedImages << " images indexed in the index." << endl;
 
     std::unordered_map<u_int32_t, vector<Hit> > indexHits; // key: visual word id, values: index hits.
     indexHits.rehash(imageReqHits.size());
     index->getImagesWithVisualWords(imageReqHits, indexHits);
 
     gettimeofday(&t[1], NULL);
-    cout << "time: " << getTimeDiff(t[0], t[1]) << " ms." << endl;
-    cout << "Ranking the images." << endl;
+    cout << currentDate() << "time: " << getTimeDiff(t[0], t[1]) << " ms." << endl;
+    cout << currentDate() << "Ranking the images." << endl;
 
     index->readLock();
     #define NB_RANKING_THREAD 4
@@ -237,7 +237,7 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     }
 
     gettimeofday(&t[2], NULL);
-    cout << "init threads time: " << getTimeDiff(t[1], t[2]) << " ms." << endl;
+    cout << currentDate() << "init threads time: " << getTimeDiff(t[1], t[2]) << " ms." << endl;
 
     // Compute
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
@@ -246,7 +246,7 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
         threads[i]->join();
 
     gettimeofday(&t[3], NULL);
-    cout << "compute time: " << getTimeDiff(t[2], t[3]) << " ms." << endl;
+    cout << currentDate() << "compute time: " << getTimeDiff(t[2], t[3]) << " ms." << endl;
 
     // Reduce...
     std::unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
@@ -257,7 +257,7 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
             weights[it->first] += it->second;
 
     gettimeofday(&t[4], NULL);
-    cout << "reduce time: " << getTimeDiff(t[3], t[4]) << " ms." << endl;
+    cout << currentDate() << "reduce time: " << getTimeDiff(t[3], t[4]) << " ms." << endl;
 
     // Free the memory
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
@@ -274,16 +274,16 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     }
 
     gettimeofday(&t[5], NULL);
-    cout << "rankedResult time: " << getTimeDiff(t[4], t[5]) << " ms." << endl;
-    cout << "Reranking 300 among " << rankedResults.size() << " images." << endl;
+    cout << currentDate() << "rankedResult time: " << getTimeDiff(t[4], t[5]) << " ms." << endl;
+    cout << currentDate() << "Reranking 300 among " << rankedResults.size() << " images." << endl;
 
     priority_queue<SearchResult> rerankedResults;
     reranker.rerank(imageReqHits, indexHits,
                     rankedResults, rerankedResults, 300);
 
     gettimeofday(&t[6], NULL);
-    cout << "time: " << getTimeDiff(t[5], t[6]) << " ms." << endl;
-    cout << "Returning the results. " << rerankedResults.size() << endl;
+    cout << currentDate() << "time: " << getTimeDiff(t[5], t[6]) << " ms." << endl;
+    cout << currentDate() << "Returning the results. " << rerankedResults.size() << endl;
 
     returnResults(rerankedResults, request, 100);
 
@@ -309,7 +309,7 @@ void ORBSearcher::returnResults(priority_queue<SearchResult> &rankedResults,
         const SearchResult &res = rankedResults.top();
         imageIds.push_back(res.i_imageId);
         i_res++;
-        cout << "Id: " << res.i_imageId << ", score: " << res.f_weight << endl;
+        cout << currentDate() << "Id: " << res.i_imageId << ", score: " << res.f_weight << endl;
         req.results.push_back(res.i_imageId);
         req.boundingRects.push_back(res.boundingRect);
         req.scores.push_back(res.f_weight);

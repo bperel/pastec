@@ -23,6 +23,7 @@
 #define PASTEC_REQUESTHANDLER_H
 
 #include <httpserver.h>
+#include <util.h>
 
 class FeatureExtractor;
 class Searcher;

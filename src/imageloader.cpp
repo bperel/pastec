@@ -41,13 +41,13 @@ u_int32_t ImageLoader::loadImage(unsigned i_imgSize, char *p_imgData, Mat &img)
     catch (cv::Exception& e) // The decoding of an image can raise an exception.
     {
         const char* err_msg = e.what();
-        cout << "Exception caught: " << err_msg << endl;
+        cout << currentDate() << "Exception caught: " << err_msg << endl;
         return IMAGE_NOT_DECODED;
     }
 
     if (!img.data)
     {
-        cout << "Error reading the image." << std::endl;
+        cout << currentDate() << "Error reading the image." << std::endl;
         return IMAGE_NOT_DECODED;
     }
 
@@ -58,7 +58,7 @@ u_int32_t ImageLoader::loadImage(unsigned i_imgSize, char *p_imgData, Mat &img)
     if (i_imgWidth > 1000
         || i_imgHeight > 1000)
     {
-        cout << "Image too large, resizing." << endl;
+        cout << currentDate() << "Image too large, resizing." << endl;
         Size size;
         if (i_imgWidth > i_imgHeight)
         {
@@ -78,7 +78,7 @@ u_int32_t ImageLoader::loadImage(unsigned i_imgSize, char *p_imgData, Mat &img)
     if (i_imgWidth < 150
         || i_imgHeight < 150)
     {
-        cout << "Image too small." << endl;
+        cout << currentDate() << "Image too small." << endl;
         return IMAGE_SIZE_TOO_SMALL;
     }
 #endif

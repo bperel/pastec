@@ -30,6 +30,7 @@
 #include <string>
 #include <fstream>
 
+#include <util.h>
 
 using namespace std;
 
@@ -108,7 +109,7 @@ public:
         p_indexData = new char[i_fileSize];
         if (p_indexData == NULL)
         {
-            cout << "Couldn't allocate the space to store the backward index file in memory." << endl;
+            cout << currentDate() << "Couldn't allocate the space to store the backward index file in memory." << endl;
             ifs.close();
             return false;
         }

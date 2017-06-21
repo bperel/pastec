@@ -48,7 +48,7 @@ void printUsage()
 
 int main(int argc, char** argv)
 {
-    cout << "Pastec Index v0.0.1" << endl;
+    cout << currentDate() << "Pastec Index v0.0.1" << endl;
 
     if (argc < 2)
     {
@@ -118,10 +118,10 @@ int main(int argc, char** argv)
     signal(SIGHUP, intHandler);
     signal(SIGINT, intHandler);
 
-    cout << "starting" << endl;
+    cout << currentDate() << "starting" << endl;
     s->run();
 
-    cout << "Terminating Pastec." << endl;
+    cout << currentDate() << "Terminating Pastec." << endl;
 
     delete s;
     delete (ORBSearcher *)is;

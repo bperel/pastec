@@ -82,9 +82,9 @@ int HTTPServer::run()
         cert_pem = loadFile("server.pem");
 
         if (key_pem == NULL)
-            std::cout << "server.key not found." << std::endl;
+            std::cout << currentDate() << "server.key not found." << std::endl;
         if (cert_pem == NULL)
-            std::cout << "server.pem not found." << std::endl;
+            std::cout << currentDate() << "server.pem not found." << std::endl;
 
         daemon = MHD_start_daemon(MHD_USE_THREAD_PER_CONNECTION | MHD_USE_SSL,
                                   i_port, NULL, NULL,
@@ -103,11 +103,11 @@ int HTTPServer::run()
     }
 
     if (daemon == NULL) {
-    	cout << "error" << endl;
+    	cout << currentDate() << "error" << endl;
         return ERROR_GENERIC;
     }
 
-    cout << "Ready to accept queries." << endl;
+    cout << currentDate() << "Ready to accept queries." << endl;
 
     pthread_mutex_lock(&stopMutex);
     while (!b_stop)

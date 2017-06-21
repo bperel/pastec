@@ -140,7 +140,7 @@ u_int32_t ORBIndex::addImage(unsigned i_imageId, list<HitForward> hitList)
     pthread_rwlock_unlock(&rwLock);
 
     if (!hitList.empty())
-        cout << "Image " << hitList.begin()->i_imageId << " added: "
+        cout << currentDate() << "Image " << hitList.begin()->i_imageId << " added: "
              << hitList.size() << " hits." << endl;
 
     return IMAGE_ADDED;
@@ -164,7 +164,7 @@ u_int32_t ORBIndex::addTag(const unsigned i_imageId, const string tag)
 
     pthread_rwlock_unlock(&rwLock);
 
-    cout << "Tag added for image " << i_imageId << "." << endl;
+    cout << currentDate() << "Tag added for image " << i_imageId << "." << endl;
 
     return IMAGE_TAG_ADDED;
 }
@@ -186,7 +186,7 @@ u_int32_t ORBIndex::removeImage(const unsigned i_imageId)
 
     if (imgIt == nbWords.end())
     {
-        cout << "Image " << i_imageId << " not found." << endl;
+        cout << currentDate() << "Image " << i_imageId << " not found." << endl;
         pthread_rwlock_unlock(&rwLock);
         return IMAGE_NOT_FOUND;
     }
@@ -200,7 +200,7 @@ u_int32_t ORBIndex::removeImage(const unsigned i_imageId)
 
         if (forwardIndexIt == forwardIndex.end())
         {
-            cout << "Image " << i_imageId << " not found." << endl;
+            cout << currentDate() << "Image " << i_imageId << " not found." << endl;
             pthread_rwlock_unlock(&rwLock);
             return IMAGE_NOT_FOUND;
         }
@@ -227,7 +227,7 @@ u_int32_t ORBIndex::removeImage(const unsigned i_imageId)
     }
     pthread_rwlock_unlock(&rwLock);
 
-    cout << "Image " << i_imageId << " removed." << endl;
+    cout << currentDate() << "Image " << i_imageId << " removed." << endl;
 
     return IMAGE_REMOVED;
 }
@@ -251,7 +251,7 @@ u_int32_t ORBIndex::getImageWords(unsigned i_imageId, unordered_map<u_int32_t, l
 
     if (imgIt == nbWords.end())
     {
-        cout << "Image " << i_imageId << " not found." << endl;
+        cout << currentDate() << "Image " << i_imageId << " not found." << endl;
         pthread_rwlock_unlock(&rwLock);
         return IMAGE_NOT_FOUND;
     }
@@ -307,7 +307,7 @@ u_int32_t ORBIndex::getImageWords(unsigned i_imageId, unordered_map<u_int32_t, l
 
     pthread_rwlock_unlock(&rwLock);
 
-    cout << "Image " << i_imageId << " found with " << hitList.size() << " words." << endl;
+    cout << currentDate() << "Image " << i_imageId << " found with " << hitList.size() << " words." << endl;
 
     return OK;
 }
@@ -332,7 +332,7 @@ u_int32_t ORBIndex::removeTag(const unsigned i_imageId)
 
     pthread_rwlock_unlock(&rwLock);
 
-    cout << "Tag deleted for image " << i_imageId << "." << endl;
+    cout << currentDate() << "Tag deleted for image " << i_imageId << "." << endl;
 
     return IMAGE_TAG_REMOVED;
 }
@@ -375,21 +375,21 @@ u_int32_t ORBIndex::write(string backwardIndexPath)
 
     ofstream ofs;
 
-    cout << "opening" << backwardIndexPath <<  endl;
+    cout << currentDate() << "opening" << backwardIndexPath <<  endl;
     ofs.open(backwardIndexPath.c_str(), ios_base::binary);
     if (!ofs.good())
     {
-        cout << "Could not open the backward index file." << endl;
+        cout << currentDate() << "Could not open the backward index file." << endl;
         return INDEX_NOT_WRITTEN;
     }
 
     pthread_rwlock_rdlock(&rwLock);
 
-    cout << "Writing the number of occurences." << endl;
+    cout << currentDate() << "Writing the number of occurences." << endl;
     for (unsigned i = 0; i < NB_VISUAL_WORDS; ++i)
         ofs.write((char *)(nbOccurences + i), sizeof(u_int64_t));
 
-    cout << "Writing the index hits." << endl;
+    cout << currentDate() << "Writing the index hits." << endl;
     for (unsigned i = 0; i < NB_VISUAL_WORDS; ++i)
     {
         const vector<Hit> &wordHits = indexHits[i];
@@ -405,7 +405,7 @@ u_int32_t ORBIndex::write(string backwardIndexPath)
     }
 
     ofs.close();
-    cout << "Writing done." << endl;
+    cout << currentDate() << "Writing done." << endl;
 
     pthread_rwlock_unlock(&rwLock);
 
@@ -434,7 +434,7 @@ u_int32_t ORBIndex::clear()
     totalNbRecords = 0;
     pthread_rwlock_unlock(&rwLock);
 
-    cout << "Index cleared." << endl;
+    cout << currentDate() << "Index cleared." << endl;
 
     return INDEX_CLEARED;
 }
@@ -453,7 +453,7 @@ u_int32_t ORBIndex::load(string backwardIndexPath)
     BackwardIndexReaderFileAccess indexAccess;
     if (!indexAccess.open(backwardIndexPath))
     {
-        cout << "Could not open the backward index file." << endl;
+        cout << currentDate() << "Could not open the backward index file." << endl;
         i_ret = INDEX_NOT_FOUND;
     }
     else
@@ -464,7 +464,7 @@ u_int32_t ORBIndex::load(string backwardIndexPath)
 
         /* Read the table to know where are located the lines corresponding to each
          * visual word. */
-        cout << "Reading the numbers of occurences." << endl;
+        cout << currentDate() << "Reading the numbers of occurences." << endl;
         u_int64_t *wordOffSet = new u_int64_t[NB_VISUAL_WORDS];
         u_int64_t i_offset = NB_VISUAL_WORDS * sizeof(u_int64_t);
         for (unsigned i = 0; i < NB_VISUAL_WORDS; ++i)
@@ -475,7 +475,7 @@ u_int32_t ORBIndex::load(string backwardIndexPath)
         }
 
         /* Count the number of words per image. */
-        cout << "Counting the number of words per image." << endl;
+        cout << currentDate() << "Counting the number of words per image." << endl;
         totalNbRecords = 0;
         while (true)
         {
@@ -493,7 +493,7 @@ u_int32_t ORBIndex::load(string backwardIndexPath)
 
         indexAccess.reset();
 
-        cout << "Loading the index in memory." << endl;
+        cout << currentDate() << "Loading the index in memory." << endl;
 
         for (unsigned i_wordId = 0; i_wordId < NB_VISUAL_WORDS; ++i_wordId)
         {
@@ -550,7 +550,7 @@ u_int32_t ORBIndex::loadTags(string indexTagsPath)
     ifs.open(indexTagsPath.c_str(), ios_base::binary);
     if (!ifs.good())
     {
-        cout << "Could not open the index tags file." << endl;
+        cout << currentDate() << "Could not open the index tags file." << endl;
         return INDEX_TAGS_NOT_FOUND;
     }
 
@@ -569,7 +569,7 @@ u_int32_t ORBIndex::loadTags(string indexTagsPath)
         char psz_tag[i_tagSize];
         ifs.read((char *)psz_tag, i_tagSize);
 
-        cout << i_imageId << " " << i_tagSize << " " << psz_tag << endl;
+        cout << currentDate() << i_imageId << " " << i_tagSize << " " << psz_tag << endl;
 
         // Save it into the memory.
         tags[i_imageId] = string(psz_tag);
@@ -596,13 +596,13 @@ u_int32_t ORBIndex::writeTags(string indexTagsPath)
     ofs.open(indexTagsPath.c_str(), ios_base::binary);
     if (!ofs.good())
     {
-        cout << "Could not open the index tags file." << endl;
+        cout << currentDate() << "Could not open the index tags file." << endl;
         return INDEX_TAGS_NOT_WRITTEN;
     }
 
     pthread_rwlock_rdlock(&rwLock);
 
-    cout << "Writing the index image tags." << endl;
+    cout << currentDate() << "Writing the index image tags." << endl;
 
     for (unordered_map<u_int32_t, string>::const_iterator it = tags.begin();
          it != tags.end(); ++it)
@@ -614,11 +614,11 @@ u_int32_t ORBIndex::writeTags(string indexTagsPath)
         ofs.write((char *)(&i_imageId), sizeof(u_int32_t));
         ofs.write((char *)(&i_tagSize), sizeof(u_int32_t));
         ofs.write((char *)(psz_tag), i_tagSize);
-        cout << "plop!" << endl;
+        cout << currentDate() << "plop!" << endl;
     }
 
     ofs.close();
-    cout << "Writing done." << endl;
+    cout << currentDate() << "Writing done." << endl;
 
     pthread_rwlock_unlock(&rwLock);
 
