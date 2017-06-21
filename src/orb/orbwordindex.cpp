@@ -33,7 +33,7 @@ ORBWordIndex::ORBWordIndex(string visualWordsPath)
         exit(1);
     assert(words->rows == 1000000);
 
-    cout << "Building the word index." << endl;
+    cout << currentDate() << "Building the word index." << endl;
 
     cvflann::Matrix<unsigned char> m_features
             ((unsigned char*)words->ptr<unsigned char>(0), words->rows, words->cols);
@@ -70,7 +70,7 @@ void ORBWordIndex::knnSearch(const Mat& query, vector<int>& indices,
  */
 bool ORBWordIndex::readVisualWords(string fileName)
 {
-    cout << "Reading the visual words file." << endl;
+    cout << currentDate() << "Reading the visual words file." << endl;
 
     // Open the input file.
     ifstream ifs;
@@ -78,7 +78,7 @@ bool ORBWordIndex::readVisualWords(string fileName)
 
     if (!ifs.good())
     {
-        cout << "Could not open the input file." << endl;
+        cout << currentDate() << "Could not open the input file." << endl;
         return false;
     }
 

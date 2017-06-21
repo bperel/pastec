@@ -313,7 +313,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
         u_int32_t i_ret;
         if (data["type"] == "PING")
         {
-            cout << "Ping received." << endl;
+            cout << currentDate() << "Ping received." << endl;
             i_ret = PONG;
         }
         else

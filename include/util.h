@@ -19,32 +19,22 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef PASTEC_ORBWORDINDEX_H
-#define PASTEC_ORBWORDINDEX_H
+#ifndef PASTEC_UTIL_H
+#define PASTEC_UTIL_H
 
-#include <vector>
+#include <string>
+#include <string.h>
+#include <iostream>
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/flann/flann.hpp>
-#include <util.h>
-
-using namespace cv;
-using namespace std;
-
-
-class ORBWordIndex
+inline std::string currentDate()
 {
-public:
-    ORBWordIndex(string visualWordsPath);
-    ~ORBWordIndex();
-    void knnSearch(const Mat &query, vector<int>& indices,
-                   vector<int> &dists, int knn);
+    time_t _tm = time(NULL );
+    struct tm * curtime = localtime ( &_tm );
+    char* currenttime = asctime(curtime);
+    currenttime[strlen(currenttime) - 1] = 0;
 
-private:
-    bool readVisualWords(string fileName);
+    std::string currenttime_str(currenttime);
+    return "[" + currenttime_str + "] ";
+}
 
-    Mat *words;  // The matrix that stores the visual words.
-    cvflann::HierarchicalClusteringIndex<cvflann::Hamming<unsigned char> > *kdIndex; // The kd-tree index.
-};
-
-#endif // PASTEC_ORBWORDINDEX_H
+#endif // PASTEC_UTIL_H
