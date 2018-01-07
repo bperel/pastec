@@ -36,45 +36,66 @@ ORBFeatureExtractor::ORBFeatureExtractor(ORBIndex *index, ORBWordIndex *wordInde
     : index(index), wordIndex(wordIndex)
 { }
 
-
-u_int32_t ORBFeatureExtractor::processNewImage(unsigned i_imageId, unsigned i_imgSize,
-                                               char *p_imgData, unsigned &i_nbFeaturesExtracted)
+ORBProcess * ORBFeatureExtractor::processImage(unsigned i_imgSize, char *p_imgData)
 {
+    auto *currentImageProcess = new ORBProcess;
+
     Mat img;
-    u_int32_t i_ret = ImageLoader::loadImage(i_imgSize, p_imgData, img);
-    if (i_ret != OK)
-        return i_ret;
+    currentImageProcess->resultStatus = ImageLoader::loadImage(i_imgSize, p_imgData, img);
+    if (currentImageProcess->resultStatus == OK) {
+        //equalizeHist( img, img );
 
-    //equalizeHist( img, img );
+        cv::Ptr<cv::ORB> orb = cv::ORB::create(2000, 1.02, 100);
+        orb->detectAndCompute(img, noArray(), currentImageProcess->keypoints, currentImageProcess->descriptors);
+    }
 
-    vector<KeyPoint> keypoints;
-    Mat descriptors;
+    return currentImageProcess;
+}
 
-    ORB(2000, 1.02, 100)(img, noArray(), keypoints, descriptors);
-    i_nbFeaturesExtracted = keypoints.size();
+ORBProcess * ORBFeatureExtractor::processNewImage(unsigned i_imageId, unsigned i_imgSize, char *p_imgData)
+{
+    ORBProcess *currentImageProcess = processImage(i_imgSize, p_imgData);
 
-    unsigned i_nbKeyPoints = 0;
     list<HitForward> imageHits;
+    processKeyPointsAndDescriptors(i_imageId, currentImageProcess->keypoints, currentImageProcess->descriptors, imageHits);
+
+#if 0
+    // Draw keypoints.
+    Mat img_res;
+    drawKeypoints(img, keypoints, img_res, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+
+    // Show the image.
+    imshow("Keypoints 1", img_res);
+    waitKey();
+#endif
+
+    // Record the hits.
+    currentImageProcess->resultStatus = index->addImage(i_imageId, imageHits);
+
+    return currentImageProcess;
+}
+
+u_int32_t ORBFeatureExtractor::processKeyPointsAndDescriptors(u_int32_t i_imageId, const vector<KeyPoint> keypoints,
+                                                              const Mat &descriptors, list<HitForward> &imageHits)
+{
     unordered_set<u_int32_t> matchedWords;
     for (unsigned i = 0; i < keypoints.size(); ++i)
     {
-        i_nbKeyPoints++;
+        auto keypoint = keypoints[i];
 
         // Recording the angle on 16 bits.
-        u_int16_t angle = keypoints[i].angle / 360 * (1 << 16);
-        u_int16_t x = keypoints[i].pt.x;
-        u_int16_t y = keypoints[i].pt.y;
+        auto angle = static_cast<u_int16_t>(keypoint.angle / 360 * (1 << 16));
+        auto x = static_cast<u_int16_t>(keypoint.pt.x);
+        auto y = static_cast<u_int16_t>(keypoint.pt.y);
 
         vector<int> indices(1);
         vector<int> dists(1);
         wordIndex->knnSearch(descriptors.row(i), indices, dists, 1);
 
-        for (unsigned j = 0; j < indices.size(); ++j)
-        {
-            const unsigned i_wordId = indices[j];
+        for (unsigned int i_wordId : indices) {
             if (matchedWords.find(i_wordId) == matchedWords.end())
             {
-                HitForward newHit;
+                HitForward newHit{};
                 newHit.i_wordId = i_wordId;
                 newHit.i_imageId = i_imageId;
                 newHit.i_angle = angle;

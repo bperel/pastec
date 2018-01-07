@@ -32,19 +32,19 @@
 #include <orbwordindex.h>
 #include <searchResult.h>
 #include <imagereranker.h>
+#include <featureextractor.h>
 
 using namespace cv;
 using namespace std;
 
 class ClientConnection;
 
-
 class ORBSearcher : public Searcher
 {
 public:
     ORBSearcher(ORBIndex *index, ORBWordIndex *wordIndex);
     virtual ~ORBSearcher();
-    u_int32_t searchImage(SearchRequest &request);
+    u_int32_t searchImage(SearchRequest request, ORBProcess *searchImageProcess);
     u_int32_t searchSimilar(SearchRequest &request);
 
 private:

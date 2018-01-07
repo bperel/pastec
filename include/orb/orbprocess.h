@@ -19,24 +19,23 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef PASTEC_FEATUREEXTRACTOR_H
-#define PASTEC_FEATUREEXTRACTOR_H
+#ifndef PASTEC_ORBPROCESS_H
+#define PASTEC_ORBPROCESS_H
 
-#include <sys/types.h>
-#include <orb/orbprocess.h>
+#include <opencv2/core/core.hpp>
+#include <hit.h>
+#include <list>
 
 using namespace cv;
+using namespace std;
 
-class FeatureExtractor
+class ORBProcess
 {
 public:
-
-    virtual ORBProcess * processNewImage(unsigned i_imageId, unsigned i_imgSize, char *p_imgData) = 0;
-
-    virtual ORBProcess * processImage(unsigned i_imgSize, char *p_imgData) = 0;
-
-    virtual u_int32_t processKeyPointsAndDescriptors(u_int32_t i_imageId, vector<KeyPoint> keypoints,
-                                             const Mat &descriptors, list <HitForward> &imageHits) = 0;
+    u_int32_t i_imageId;
+    vector<KeyPoint> keypoints;
+    Mat descriptors;
+    u_int32_t resultStatus;
 };
 
-#endif // PASTEC_FEATUREEXTRACTOR_H
+#endif // PASTEC_ORBPROCESS_H

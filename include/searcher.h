@@ -31,6 +31,7 @@ using namespace std;
 using namespace cv;
 
 class ClientConnection;
+class ORBProcess;
 
 
 struct SearchRequest
@@ -48,7 +49,7 @@ struct SearchRequest
 class Searcher
 {
 public:
-    virtual u_int32_t searchImage(SearchRequest &request) = 0;
+    virtual u_int32_t searchImage(SearchRequest request, ORBProcess *searchImageProcess) = 0;
     virtual u_int32_t searchSimilar(SearchRequest &request) = 0;
 };
 

@@ -30,6 +30,7 @@
 
 #include <orbindex.h>
 #include <orbwordindex.h>
+#include <orbprocess.h>
 #include <featureextractor.h>
 
 class ClientConnection;
@@ -45,9 +46,12 @@ public:
     ORBFeatureExtractor(ORBIndex *index, ORBWordIndex *wordIndex);
     virtual ~ORBFeatureExtractor() {}
 
-    u_int32_t processNewImage(unsigned i_imageId, unsigned i_imgSize,
-                              char *p_imgData, unsigned &i_nbFeaturesExtracted);
+    ORBProcess *processNewImage(unsigned i_imageId, unsigned i_imgSize, char *p_imgData);
 
+    ORBProcess *processImage(unsigned i_imgSize, char *p_imgData);
+
+    u_int32_t processKeyPointsAndDescriptors(u_int32_t i_imageId, vector<KeyPoint> keypoints,
+                                                 const Mat &descriptors, list <HitForward> &imageHits);
 private:
     ORBIndex *index;
     ORBWordIndex *wordIndex;

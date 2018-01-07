@@ -40,6 +40,7 @@
 #include <orbsearcher.h>
 #include <messages.h>
 #include <imageloader.h>
+#include <featureextractor.h>
 
 #ifndef __APPLE__
 using namespace std::tr1;
@@ -108,28 +109,12 @@ public:
  * @brief Processed a search request.
  * @param request the request to proceed.
  */
-u_int32_t ORBSearcher::searchImage(SearchRequest &request)
+u_int32_t ORBSearcher::searchImage(SearchRequest request, ORBProcess *searchImageProcess)
 {
-    timeval t[3];
+    timeval t[2];
     gettimeofday(&t[0], NULL);
 
-    cout << currentDate() << "Loading the image and extracting the ORBs." << endl;
-
-    Mat img;
-    u_int32_t i_ret = ImageLoader::loadImage(request.imageData.size(),
-                                             request.imageData.data(), img);
-    if (i_ret != OK)
-        return i_ret;
-
-    vector<KeyPoint> keypoints;
-    Mat descriptors;
-
-    ORB(2000, 1.02, 100)(img, noArray(), keypoints, descriptors);
-
-    gettimeofday(&t[1], NULL);
-
-    cout << currentDate() << "time: " << getTimeDiff(t[0], t[1]) << " ms." << endl;
-    cout << currentDate() << "Looking for the visual words. " << endl;
+    cout << currentDate() << "Looking for the visual words. " << searchImageProcess->descriptors.rows << " " << searchImageProcess->descriptors.cols << endl;
 
     const unsigned i_nbTotalIndexedImages = index->getTotalNbIndexedImages();
     const unsigned i_maxNbOccurences = i_nbTotalIndexedImages > 10000 ?
@@ -137,13 +122,13 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
                                        : i_nbTotalIndexedImages;
 
     std::unordered_map<u_int32_t, list<Hit> > imageReqHits; // key: visual word, value: the found angles
-    for (unsigned i = 0; i < keypoints.size(); ++i)
+    for (unsigned i = 0; i < searchImageProcess->keypoints.size(); ++i)
     {
         #define NB_NEIGHBORS 1
 
         vector<int> indices(NB_NEIGHBORS);
         vector<int> dists(NB_NEIGHBORS);
-        wordIndex->knnSearch(descriptors.row(i), indices,
+        wordIndex->knnSearch(searchImageProcess->descriptors.row(i), indices,
                            dists, NB_NEIGHBORS);
 
         for (unsigned j = 0; j < indices.size(); ++j)
@@ -158,17 +143,17 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
                 // Convert the angle to a 16 bit integer.
                 Hit hit;
                 hit.i_imageId = 0;
-                hit.i_angle = keypoints[i].angle / 360 * (1 << 16);
-                hit.x = keypoints[i].pt.x;
-                hit.y = keypoints[i].pt.y;
+                hit.i_angle = searchImageProcess->keypoints[i].angle / 360 * (1 << 16);
+                hit.x = searchImageProcess->keypoints[i].pt.x;
+                hit.y = searchImageProcess->keypoints[i].pt.y;
 
                 imageReqHits[i_wordId].push_back(hit);
             }
         }
     }
 
-    gettimeofday(&t[2], NULL);
-    cout << currentDate() << "time: " << getTimeDiff(t[1], t[2]) << " ms." << endl;
+    gettimeofday(&t[1], NULL);
+    cout << currentDate() << "time: " << getTimeDiff(t[0], t[1]) << " ms." << endl;
 
     return processSimilar(request, imageReqHits);
 }

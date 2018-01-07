@@ -28,9 +28,9 @@
 #include <json/json.h>
 #endif
 
-#include <requesthandler.h>
 #include <messages.h>
 #include <featureextractor.h>
+#include <requesthandler.h>
 #include <searcher.h>
 #include <index.h>
 
@@ -139,14 +139,14 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     {
         u_int32_t i_imageId = atoi(parsedURI[2].c_str());
 
-        unsigned i_nbFeaturesExtracted;
-        u_int32_t i_ret = featureExtractor->processNewImage(
-            i_imageId, conInfo.uploadedData.size(), conInfo.uploadedData.data(),
-            i_nbFeaturesExtracted);
+        ORBProcess *imageProcess = featureExtractor->processNewImage(i_imageId,
+                                                                                            conInfo.uploadedData.size(),
+                                                                                            conInfo.uploadedData.data());
+        unsigned i_nbFeaturesExtracted = static_cast<unsigned int>(imageProcess->keypoints.size());
 
-        ret["type"] = Converter::codeToString(i_ret);
+        ret["type"] = Converter::codeToString(imageProcess->resultStatus);
         ret["image_id"] = Json::Value(i_imageId);
-        if (i_ret == IMAGE_ADDED)
+        if (imageProcess->resultStatus == IMAGE_ADDED)
             ret["nb_features_extracted"] = Json::Value(i_nbFeaturesExtracted);
     }
     else if (testURIWithPattern(parsedURI, p_image)
@@ -186,7 +186,10 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
 
         req.imageData = conInfo.uploadedData;
         req.client = NULL;
-        u_int32_t i_ret = imageSearcher->searchImage(req);
+
+        ORBProcess *newImageProcess = featureExtractor->processImage(
+                conInfo.uploadedData.size(), conInfo.uploadedData.data());
+        u_int32_t i_ret = imageSearcher->searchImage(req, newImageProcess);
 
         ret["type"] = Converter::codeToString(i_ret);
         if (i_ret == SEARCH_RESULTS)
