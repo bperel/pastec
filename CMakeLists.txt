@@ -11,6 +11,7 @@ set(SOURCES      src/main.cpp
                  src/requesthandler.cpp
                  src/orb/orbfeatureextractor.cpp
                  src/orb/orbindex.cpp
+                 src/orb/orbprocess.cpp
                  src/orb/orbsearcher.cpp
                  src/orb/orbwordindex.cpp)
 
@@ -25,6 +26,7 @@ set(HEADERS      include/thread.h
                  include/featureextractor.h
                  include/orb/orbfeatureextractor.h
                  include/orb/orbindex.h
+                 include/orb/orbprocess.h
                  include/orb/orbsearcher.h
                  include/orb/orbwordindex.h
                  include/searcher.h

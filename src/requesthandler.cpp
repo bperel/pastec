@@ -123,6 +123,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     string p_image[] = {"index", "images", "IDENTIFIER", ""};
     string p_tag[] = {"index", "images", "IDENTIFIER", "tag", ""};
     string p_searchImage[] = {"index", "searcher", ""};
+    string p_searchImageByMarkers[] = {"index", "searcher", "markers"};
     string p_ioIndex[] = {"index", "io", ""};
     string p_imageIds[] = {"index", "imageIds", ""};
     string p_root[] = {""};
@@ -179,17 +180,37 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
 
         ret["type"] = Converter::codeToString(i_ret);
     }
-    else if (testURIWithPattern(parsedURI, p_searchImage)
+    else if ((testURIWithPattern(parsedURI, p_searchImage) || testURIWithPattern(parsedURI, p_searchImageByMarkers))
              && conInfo.connectionType == POST)
     {
         SearchRequest req;
-
-        req.imageData = conInfo.uploadedData;
         req.client = NULL;
 
-        ORBProcess *newImageProcess = featureExtractor->processImage(
-                conInfo.uploadedData.size(), conInfo.uploadedData.data());
-        u_int32_t i_ret = imageSearcher->searchImage(req, newImageProcess);
+        ORBProcess inputImageProcess;
+        if (testURIWithPattern(parsedURI, p_searchImageByMarkers)) { // By markers
+            string dataStr(conInfo.uploadedData.begin(),
+                           conInfo.uploadedData.end());
+
+            Json::Value data = StringToJson(dataStr);
+            Json::Value keyPointsInput = data["keypoints"];
+            Json::Value descriptorsInput = data["descriptors"];
+
+            vector<KeyPoint> keyPoints;
+            for(unsigned int index=0; index<keyPointsInput.size(); ++index) {
+//                keyPoints.push_back(new KeyPoint(keyPointsInput[index]...));
+            }
+
+            Mat descriptors;
+//            descriptors = new Mat(descriptorsInput ...);
+
+            inputImageProcess = ORBProcess(keyPoints, descriptors);
+        }
+        else { // By raw image
+            req.imageData = conInfo.uploadedData;
+            inputImageProcess = * featureExtractor->processImage(
+                    conInfo.uploadedData.size(), conInfo.uploadedData.data());
+        }
+        u_int32_t i_ret = imageSearcher->searchImage(req, &inputImageProcess);
 
         ret["type"] = Converter::codeToString(i_ret);
         if (i_ret == SEARCH_RESULTS)

@@ -19,26 +19,12 @@
  * along with Pastec.  If not, see <http://www.gnu.org/licenses/>.
  *****************************************************************************/
 
-#ifndef PASTEC_ORBPROCESS_H
-#define PASTEC_ORBPROCESS_H
+#include <orbprocess.h>
 
-#include <opencv2/core/core.hpp>
-#include <hit.h>
-#include <list>
 
-using namespace cv;
-using namespace std;
+ORBProcess::ORBProcess()
+= default;
 
-class ORBProcess
-{
-public:
-    ORBProcess();
-    ORBProcess(vector<KeyPoint> keypoints, Mat descriptors);
-
-    u_int32_t i_imageId;
-    vector<KeyPoint> keypoints;
-    Mat descriptors;
-    u_int32_t resultStatus;
-};
-
-#endif // PASTEC_ORBPROCESS_H
+ORBProcess::ORBProcess(vector<KeyPoint> keypoints, Mat descriptors)
+    : keypoints(keypoints), descriptors(descriptors)
+{ }
