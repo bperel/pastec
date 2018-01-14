@@ -31,6 +31,12 @@
 #include <messages.h>
 #include <imageloader.h>
 
+#include <cereal/types/keypoint.hpp>
+#include <cereal/types/mat.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/archives/binary.hpp>
+
 
 ORBFeatureExtractor::ORBFeatureExtractor(ORBIndex *index, ORBWordIndex *wordIndex)
     : index(index), wordIndex(wordIndex)
@@ -48,6 +54,19 @@ ORBProcess * ORBFeatureExtractor::processImage(unsigned i_imgSize, char *p_imgDa
         cv::Ptr<cv::ORB> orb = cv::ORB::create(2000, 1.02, 100);
         orb->detectAndCompute(img, noArray(), currentImageProcess->keypoints, currentImageProcess->descriptors);
     }
+
+    std::stringstream ss;
+    {
+        cereal::BinaryOutputArchive ar(ss);
+        ar(currentImageProcess->descriptors);
+    }
+
+    {
+        cereal::BinaryOutputArchive ar(ss);
+        ar(currentImageProcess->keypoints);
+    }
+
+    std::string s2 = ss.str();
 
     return currentImageProcess;
 }

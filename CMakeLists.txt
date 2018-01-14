@@ -24,6 +24,7 @@ set(HEADERS      include/thread.h
                  include/imageloader.h
                  include/index.h
                  include/featureextractor.h
+                 include/cereal/archives/json.hpp
                  include/orb/orbfeatureextractor.h
                  include/orb/orbindex.h
                  include/orb/orbprocess.h

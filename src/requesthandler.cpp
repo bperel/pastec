@@ -34,6 +34,9 @@
 #include <searcher.h>
 #include <index.h>
 
+#include <cereal/types/vector.hpp>
+#include <cereal/archives/json.hpp>
+
 #include <imageloader.h>
 #include <opencv2/highgui/highgui.hpp>
 
@@ -192,16 +195,23 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
                            conInfo.uploadedData.end());
 
             Json::Value data = StringToJson(dataStr);
-            Json::Value keyPointsInput = data["keypoints"];
-            Json::Value descriptorsInput = data["descriptors"];
+
+            string keyPointsInput = data["keypoints"].asString();
+            string descriptorsInput = data["descriptors"].asString();
+
+            std::stringstream is(keyPointsInput);
 
             vector<KeyPoint> keyPoints;
-            for(unsigned int index=0; index<keyPointsInput.size(); ++index) {
-//                keyPoints.push_back(new KeyPoint(keyPointsInput[index]...));
+            {
+                cereal::JSONInputArchive archive_in(is);
+                archive_in(keyPoints);
             }
 
             Mat descriptors;
-//            descriptors = new Mat(descriptorsInput ...);
+            {
+                cereal::JSONInputArchive archive_in(is);
+                archive_in(descriptors);
+            }
 
             inputImageProcess = ORBProcess(keyPoints, descriptors);
         }
