@@ -25,6 +25,9 @@ set(HEADERS      include/thread.h
                  include/index.h
                  include/featureextractor.h
                  include/cereal/archives/json.hpp
+                 include/cereal/types/keypoint.hpp
+                 include/cereal/types/mat.hpp
+                 include/cereal/types/vector.hpp
                  include/orb/orbfeatureextractor.h
                  include/orb/orbindex.h
                  include/orb/orbprocess.h

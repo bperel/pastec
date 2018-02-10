@@ -35,6 +35,8 @@
 #include <index.h>
 
 #include <cereal/types/vector.hpp>
+#include <cereal/types/keypoint.hpp>
+#include <cereal/types/mat.hpp>
 #include <cereal/archives/json.hpp>
 
 #include <imageloader.h>
