@@ -41,6 +41,8 @@
 
 #include <imageloader.h>
 #include <opencv2/highgui/highgui.hpp>
+#include <fstream>
+#include <cereal/archives/binary.hpp>
 
 
 RequestHandler::RequestHandler(FeatureExtractor *featureExtractor,
@@ -205,14 +207,14 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
 
             vector<KeyPoint> keyPoints;
             {
-                cereal::JSONInputArchive archive_in(is);
-                archive_in(keyPoints);
+                cereal::BinaryInputArchive ar_keypoints(is);
+                ar_keypoints(keyPoints);
             }
 
             Mat descriptors;
             {
-                cereal::JSONInputArchive archive_in(is);
-                archive_in(descriptors);
+                cereal::BinaryInputArchive ar_descriptors(is);
+                ar_descriptors(descriptors);
             }
 
             inputImageProcess = ORBProcess(keyPoints, descriptors);

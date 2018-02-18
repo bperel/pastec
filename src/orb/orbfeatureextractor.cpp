@@ -55,19 +55,6 @@ ORBProcess * ORBFeatureExtractor::processImage(unsigned i_imgSize, char *p_imgDa
         orb->detectAndCompute(img, noArray(), currentImageProcess->keypoints, currentImageProcess->descriptors);
     }
 
-    std::stringstream ss;
-    {
-        cereal::BinaryOutputArchive ar(ss);
-        ar(currentImageProcess->descriptors);
-    }
-
-    {
-        cereal::BinaryOutputArchive ar(ss);
-        ar(currentImageProcess->keypoints);
-    }
-
-    std::string s2 = ss.str();
-
     return currentImageProcess;
 }
 
