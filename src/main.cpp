@@ -112,7 +112,9 @@ int main(int argc, char** argv)
     ORBWordIndex *wordIndex = new ORBWordIndex(visualWordPath);
     FeatureExtractor *ife = new ORBFeatureExtractor((ORBIndex *)index, wordIndex);
     Searcher *is = new ORBSearcher((ORBIndex *)index, wordIndex);
-    RequestHandler *rh = new RequestHandler(ife, is, index, authKey);
+    ImageDownloader *imgDownloader = new ImageDownloader();
+
+    RequestHandler *rh = new RequestHandler(ife, is, index, imgDownloader, authKey);
     s = new HTTPServer(rh, i_port, https);
 
     signal(SIGHUP, intHandler);
@@ -124,6 +126,7 @@ int main(int argc, char** argv)
     cout << currentDate() << "Terminating Pastec." << endl;
 
     delete s;
+    delete imgDownloader;
     delete (ORBSearcher *)is;
     delete (ORBFeatureExtractor *)ife;
     delete (ORBIndex *)index;
