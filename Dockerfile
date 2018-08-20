@@ -4,7 +4,7 @@ MAINTAINER Bruno Perel <brunoperel@gmail.com>
 
 RUN apk update && apk add libmicrohttpd-dev jsoncpp-dev curl-dev
 
-RUN git clone --single-branch alpine --depth 1 https://github.com/bperel/pastec.git /pastec
+RUN git clone --single-branch --branch alpine --depth 1 https://github.com/bperel/pastec.git /pastec
 RUN mkdir -p /pastec/build && mkdir /pastec/data
 WORKDIR /pastec/build
 RUN cmake ../ && make -j$(nproc)
