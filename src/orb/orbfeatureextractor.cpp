@@ -36,11 +36,11 @@ ORBFeatureExtractor::ORBFeatureExtractor(ORBIndex *index, ORBWordIndex *wordInde
 { }
 
 
-u_int32_t ORBFeatureExtractor::processNewImage(unsigned i_imageId, unsigned i_imgSize,
+uint32_t ORBFeatureExtractor::processNewImage(unsigned i_imageId, unsigned i_imgSize,
                                                char *p_imgData, unsigned &i_nbFeaturesExtracted)
 {
     Mat img;
-    u_int32_t i_ret = ImageLoader::loadImage(i_imgSize, p_imgData, img);
+    uint32_t i_ret = ImageLoader::loadImage(i_imgSize, p_imgData, img);
     if (i_ret != OK)
         return i_ret;
 
@@ -54,7 +54,7 @@ u_int32_t ORBFeatureExtractor::processNewImage(unsigned i_imageId, unsigned i_im
 
     unsigned i_nbKeyPoints = 0;
     list<HitForward> imageHits;
-    unordered_set<u_int32_t> matchedWords;
+    unordered_set<uint32_t> matchedWords;
     for (unsigned i = 0; i < keypoints.size(); ++i)
     {
         i_nbKeyPoints++;

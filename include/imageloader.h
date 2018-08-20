@@ -22,6 +22,7 @@
 #ifndef PASTEC_IMAGELOADER_H
 #define PASTEC_IMAGELOADER_H
 
+#include <stdint.h>
 #include <opencv2/core/core.hpp>
 
 
@@ -31,7 +32,7 @@ using namespace cv;
 class ImageLoader
 {
 public:
-    static u_int32_t loadImage(unsigned i_imgSize, char *p_imgData, Mat &img);
+    static uint32_t loadImage(unsigned i_imgSize, char *p_imgData, Mat &img);
 };
 
 #endif // PASTEC_IMAGELOADER_H

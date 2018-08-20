@@ -44,15 +44,15 @@ class ORBSearcher : public Searcher
 public:
     ORBSearcher(ORBIndex *index, ORBWordIndex *wordIndex);
     virtual ~ORBSearcher();
-    u_int32_t searchImage(SearchRequest &request);
-    u_int32_t searchSimilar(SearchRequest &request);
+    uint32_t searchImage(SearchRequest &request);
+    uint32_t searchSimilar(SearchRequest &request);
 
 private:
     void returnResults(priority_queue<SearchResult> &rankedResults,
                        SearchRequest &req, unsigned i_maxNbResults);
     unsigned long getTimeDiff(const timeval t1, const timeval t2) const;
-    u_int32_t processSimilar(SearchRequest &request,
-                             std::unordered_map<u_int32_t, list<Hit> > imageReqHits);
+    uint32_t processSimilar(SearchRequest &request,
+                             std::unordered_map<uint32_t, list<Hit> > imageReqHits);
 
     ORBIndex *index;
     ORBWordIndex *wordIndex;

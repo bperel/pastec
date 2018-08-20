@@ -40,14 +40,14 @@ bool ImageDownloader::canDownloadImage(std::string imgURL)
 }
 
 
-u_int32_t ImageDownloader::getImageData(std::string imgURL, std::vector<char> &imgData,
+uint32_t ImageDownloader::getImageData(std::string imgURL, std::vector<char> &imgData,
                                         long &responseCode)
 {
     if (!canDownloadImage(imgURL))
         return ERROR_GENERIC;
 
 
-    u_int32_t i_ret = OK;
+    uint32_t i_ret = OK;
 
     CURL *curlHandle = curl_easy_init();
 

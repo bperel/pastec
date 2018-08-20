@@ -47,24 +47,24 @@ class ORBIndex : public Index
 public:
     ORBIndex(string indexPath, bool buildForwardIndex);
     virtual ~ORBIndex();
-    void getImagesWithVisualWords(std::unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
-                                  std::unordered_map<u_int32_t, vector<Hit> > &indexHitsForReq);
+    void getImagesWithVisualWords(std::unordered_map<uint32_t, list<Hit> > &imagesReqHits,
+                                  std::unordered_map<uint32_t, vector<Hit> > &indexHitsForReq);
     unsigned getWordNbOccurences(unsigned i_wordId);
     unsigned countTotalNbWord(unsigned i_imageId);
     unsigned getTotalNbIndexedImages();
-    u_int32_t addImage(unsigned i_imageId, list<HitForward> hitList);
-    u_int32_t addTag(const unsigned i_imageId, const string tag);
-    u_int32_t removeImage(const unsigned i_imageId);
-    u_int32_t getImageWords(const unsigned i_imageId, unordered_map<u_int32_t, list<Hit> > &hitList);
-    u_int32_t removeTag(const unsigned i_imageId);
-    u_int32_t getTag(unsigned i_imageId, string &tag);
-    u_int32_t write(string backwardIndexPath);
-    u_int32_t clear();
-    u_int32_t load(string backwardIndexPath);
-    u_int32_t getImageIds(vector<u_int32_t> &imageIds);
+    uint32_t addImage(unsigned i_imageId, list<HitForward> hitList);
+    uint32_t addTag(const unsigned i_imageId, const string tag);
+    uint32_t removeImage(const unsigned i_imageId);
+    uint32_t getImageWords(const unsigned i_imageId, unordered_map<uint32_t, list<Hit> > &hitList);
+    uint32_t removeTag(const unsigned i_imageId);
+    uint32_t getTag(unsigned i_imageId, string &tag);
+    uint32_t write(string backwardIndexPath);
+    uint32_t clear();
+    uint32_t load(string backwardIndexPath);
+    uint32_t getImageIds(vector<uint32_t> &imageIds);
 
-    u_int32_t loadTags(string indexTagsPath);
-    u_int32_t writeTags(string indexTagsPath);
+    uint32_t loadTags(string indexTagsPath);
+    uint32_t writeTags(string indexTagsPath);
 
     void readLock();
     void unlock();
@@ -76,7 +76,7 @@ private:
 
     unordered_map<u_int64_t, unsigned> nbWords;
     unordered_map<u_int64_t, vector<unsigned> > forwardIndex;
-    unordered_map<u_int32_t, string> tags;
+    unordered_map<uint32_t, string> tags;
     vector<Hit> indexHits[NB_VISUAL_WORDS];
 
     pthread_rwlock_t rwLock;

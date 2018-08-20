@@ -36,17 +36,17 @@ class HitForward;
 class Index
 {
 public:
-    virtual u_int32_t addTag(const unsigned i_imageId, const string tag) = 0;
-    virtual u_int32_t removeImage(const unsigned i_imageId) = 0;
-    virtual u_int32_t removeTag(const unsigned i_imageId) = 0;
-    virtual u_int32_t getTag(unsigned i_imageId, string &tag) = 0;
-    virtual u_int32_t write(string backwardIndexPath) = 0;
-    virtual u_int32_t clear() = 0;
-    virtual u_int32_t load(string backwardIndexPath) = 0;
-    virtual u_int32_t getImageIds(vector<u_int32_t> &imageIds) = 0;
+    virtual uint32_t addTag(const unsigned i_imageId, const string tag) = 0;
+    virtual uint32_t removeImage(const unsigned i_imageId) = 0;
+    virtual uint32_t removeTag(const unsigned i_imageId) = 0;
+    virtual uint32_t getTag(unsigned i_imageId, string &tag) = 0;
+    virtual uint32_t write(string backwardIndexPath) = 0;
+    virtual uint32_t clear() = 0;
+    virtual uint32_t load(string backwardIndexPath) = 0;
+    virtual uint32_t getImageIds(vector<uint32_t> &imageIds) = 0;
 
-    virtual u_int32_t loadTags(string indexTagsPath) = 0;
-    virtual u_int32_t writeTags(string indexTagsPath) = 0;
+    virtual uint32_t loadTags(string indexTagsPath) = 0;
+    virtual uint32_t writeTags(string indexTagsPath) = 0;
 };
 
 #endif // PASTEC_INDEX_H
