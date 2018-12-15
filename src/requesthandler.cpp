@@ -22,7 +22,11 @@
 #include <iostream>
 #include <stdlib.h>
 
+#ifndef __APPLE__
+#include <jsoncpp/json/json.h>
+#else
 #include <json/json.h>
+#endif
 
 #include <messages.h>
 #include <featureextractor.h>
@@ -127,7 +131,6 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     string p_image[] = {"index", "images", "IDENTIFIER", ""};
     string p_tag[] = {"index", "images", "IDENTIFIER", "tag", ""};
     string p_searchImage[] = {"index", "searcher", ""};
-    string p_searchImageByMarkers[] = {"index", "searcher", "markers"};
     string p_ioIndex[] = {"index", "io", ""};
     string p_imageIds[] = {"index", "imageIds", ""};
     string p_root[] = {""};
@@ -205,19 +208,16 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
 
         ret["type"] = Converter::codeToString(i_ret);
     }
-    else if ((testURIWithPattern(parsedURI, p_searchImage) || testURIWithPattern(parsedURI, p_searchImageByMarkers))
-             && conInfo.connectionType == POST)
+    else if (testURIWithPattern(parsedURI, p_searchImage) && conInfo.connectionType == POST)
     {
         SearchRequest req;
         req.client = NULL;
 
+        string dataStr(conInfo.uploadedData.begin(),
+                       conInfo.uploadedData.end());
+        Json::Value data = StringToJson(dataStr);
         ORBProcess inputImageProcess;
-        if (testURIWithPattern(parsedURI, p_searchImageByMarkers)) { // By markers
-            string dataStr(conInfo.uploadedData.begin(),
-                           conInfo.uploadedData.end());
-
-            Json::Value data = StringToJson(dataStr);
-
+        if (data.isMember("keypoints")) { // By markers
             string keyPointsInput = data["keypoints"].asString();
             string descriptorsInput = data["descriptors"].asString();
 
@@ -247,10 +247,6 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
         if (i_ret == IMAGE_NOT_DECODED)
         {
             // Check if the data is an image URL to load
-            string dataStr(conInfo.uploadedData.begin(),
-                           conInfo.uploadedData.end());
-
-            Json::Value data = StringToJson(dataStr);
             string imgURL = data["url"].asString();
             if (imgDownloader->canDownloadImage(imgURL))
             {
