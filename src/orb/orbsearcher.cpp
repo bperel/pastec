@@ -64,11 +64,11 @@ class RankingThread : public Thread
 {
 public:
     RankingThread(ORBIndex *index, const unsigned i_nbTotalIndexedImages,
-                  std::unordered_map<u_int32_t, vector<Hit> > &indexHits)
+                  std::unordered_map<uint32_t, vector<Hit> > &indexHits)
         : index(index), i_nbTotalIndexedImages(i_nbTotalIndexedImages),
           indexHits(indexHits) { }
 
-    void addWord(u_int32_t i_wordId)
+    void addWord(uint32_t i_wordId)
     {
         wordIds.push_back(i_wordId);
     }
@@ -77,7 +77,7 @@ public:
     {
         weights.rehash(wordIds.size());
 
-        for (deque<u_int32_t>::const_iterator it = wordIds.begin();
+        for (deque<uint32_t>::const_iterator it = wordIds.begin();
             it != wordIds.end(); ++it)
         {
             const vector<Hit> &hits = indexHits[*it];
@@ -99,9 +99,9 @@ public:
 
     ORBIndex *index;
     const unsigned i_nbTotalIndexedImages;
-    std::unordered_map<u_int32_t, vector<Hit> > &indexHits;
-    deque<u_int32_t> wordIds;
-    std::unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
+    std::unordered_map<uint32_t, vector<Hit> > &indexHits;
+    deque<uint32_t> wordIds;
+    std::unordered_map<uint32_t, float> weights; // key: image id, value: image score.
 };
 
 
@@ -109,7 +109,7 @@ public:
  * @brief Processed a search request.
  * @param request the request to proceed.
  */
-u_int32_t ORBSearcher::searchImage(SearchRequest request, ORBProcess *searchImageProcess)
+uint32_t ORBSearcher::searchImage(SearchRequest request, ORBProcess *searchImageProcess)
 {
     timeval t[2];
     gettimeofday(&t[0], NULL);
@@ -121,7 +121,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest request, ORBProcess *searchImag
                                        0.15 * i_nbTotalIndexedImages
                                        : i_nbTotalIndexedImages;
 
-    std::unordered_map<u_int32_t, list<Hit> > imageReqHits; // key: visual word, value: the found angles
+    std::unordered_map<uint32_t, list<Hit> > imageReqHits; // key: visual word, value: the found angles
     for (unsigned i = 0; i < searchImageProcess->keypoints.size(); ++i)
     {
         #define NB_NEIGHBORS 1
@@ -163,7 +163,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest request, ORBProcess *searchImag
  * @brief Processed a similarity request.
  * @param request the request to proceed.
  */
-u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
+uint32_t ORBSearcher::searchSimilar(SearchRequest &request)
 {
     timeval t[2];
     gettimeofday(&t[0], NULL);
@@ -171,8 +171,8 @@ u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
     cout << currentDate() << "Loading the image words from the index." << endl;
 
     // key: visual word, value: the found angles
-    std::unordered_map<u_int32_t, list<Hit> > imageReqHits;
-    u_int32_t i_ret = index->getImageWords(request.imageId, imageReqHits);
+    std::unordered_map<uint32_t, list<Hit> > imageReqHits;
+    uint32_t i_ret = index->getImageWords(request.imageId, imageReqHits);
 
     if (i_ret != OK)
         return i_ret;
@@ -184,8 +184,8 @@ u_int32_t ORBSearcher::searchSimilar(SearchRequest &request)
 }
 
 
-u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
-        std::unordered_map<u_int32_t, list<Hit> > imageReqHits)
+uint32_t ORBSearcher::processSimilar(SearchRequest &request,
+        std::unordered_map<uint32_t, list<Hit> > imageReqHits)
 {
     timeval t[7];
     gettimeofday(&t[0], NULL);
@@ -195,7 +195,7 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     cout << currentDate() << imageReqHits.size() << " visual words kept for the request." << endl;
     cout << currentDate() << i_nbTotalIndexedImages << " images indexed in the index." << endl;
 
-    std::unordered_map<u_int32_t, vector<Hit> > indexHits; // key: visual word id, values: index hits.
+    std::unordered_map<uint32_t, vector<Hit> > indexHits; // key: visual word id, values: index hits.
     indexHits.rehash(imageReqHits.size());
     index->getImagesWithVisualWords(imageReqHits, indexHits);
 
@@ -210,7 +210,7 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     unsigned i_wordsPerThread = indexHits.size() / NB_RANKING_THREAD + 1;
     RankingThread *threads[NB_RANKING_THREAD];
 
-    std::unordered_map<u_int32_t, vector<Hit> >::const_iterator it = indexHits.begin();
+    std::unordered_map<uint32_t, vector<Hit> >::const_iterator it = indexHits.begin();
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
     {
         threads[i] = new RankingThread(index, i_nbTotalIndexedImages, indexHits);
@@ -233,10 +233,10 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     cout << currentDate() << "compute time: " << getTimeDiff(t[2], t[3]) << " ms." << endl;
 
     // Reduce...
-    std::unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
+    std::unordered_map<uint32_t, float> weights; // key: image id, value: image score.
     weights.rehash(i_nbTotalIndexedImages);
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
-        for (std::unordered_map<u_int32_t, float>::const_iterator it = threads[i]->weights.begin();
+        for (std::unordered_map<uint32_t, float>::const_iterator it = threads[i]->weights.begin();
             it != threads[i]->weights.end(); ++it)
             weights[it->first] += it->second;
 
@@ -284,7 +284,7 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
 void ORBSearcher::returnResults(priority_queue<SearchResult> &rankedResults,
                                   SearchRequest &req, unsigned i_maxNbResults)
 {
-    list<u_int32_t> imageIds;
+    list<uint32_t> imageIds;
 
     unsigned i_res = 0;
     while(!rankedResults.empty()

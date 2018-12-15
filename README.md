@@ -1,6 +1,10 @@
 Pastec
 ======
 
+This is a modified version of Pastec that can be run on Alpine.
+You can use it as such :
+docker run -d bperel/pastec:alpine
+
 Introduction
 ------------
 

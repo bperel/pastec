@@ -80,10 +80,10 @@ ORBProcess * ORBFeatureExtractor::processNewImage(unsigned i_imageId, unsigned i
     return currentImageProcess;
 }
 
-u_int32_t ORBFeatureExtractor::processKeyPointsAndDescriptors(u_int32_t i_imageId, const vector<KeyPoint> keypoints,
+uint32_t ORBFeatureExtractor::processKeyPointsAndDescriptors(uint32_t i_imageId, const vector<KeyPoint> keypoints,
                                                               const Mat &descriptors, list<HitForward> &imageHits)
 {
-    unordered_set<u_int32_t> matchedWords;
+    unordered_set<uint32_t> matchedWords;
     for (unsigned i = 0; i < keypoints.size(); ++i)
     {
         auto keypoint = keypoints[i];

@@ -36,10 +36,10 @@ class ORBProcess;
 
 struct SearchRequest
 {
-    u_int32_t imageId;
+    uint32_t imageId;
     vector<char> imageData;
     ClientConnection *client;
-    vector<u_int32_t> results;
+    vector<uint32_t> results;
     vector<Rect> boundingRects;
     vector<float> scores;
     vector<string> tags;
@@ -49,8 +49,8 @@ struct SearchRequest
 class Searcher
 {
 public:
-    virtual u_int32_t searchImage(SearchRequest request, ORBProcess *searchImageProcess) = 0;
-    virtual u_int32_t searchSimilar(SearchRequest &request) = 0;
+    virtual uint32_t searchImage(SearchRequest request, ORBProcess *searchImageProcess) = 0;
+    virtual uint32_t searchSimilar(SearchRequest &request) = 0;
 };
 
 #endif // PASTEC_SEARCHER_H

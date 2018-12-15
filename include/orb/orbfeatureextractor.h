@@ -51,7 +51,7 @@ public:
 
     ORBProcess *processImage(unsigned i_imgSize, char *p_imgData);
 
-    u_int32_t processKeyPointsAndDescriptors(u_int32_t i_imageId, vector<KeyPoint> keypoints,
+    uint32_t processKeyPointsAndDescriptors(uint32_t i_imageId, vector<KeyPoint> keypoints,
                                                  const Mat &descriptors, list <HitForward> &imageHits);
 private:
     ORBIndex *index;

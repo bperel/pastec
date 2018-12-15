@@ -29,7 +29,7 @@
 #include <messages.h>
 
 
-u_int32_t ImageLoader::loadImage(unsigned i_imgSize, char *p_imgData, Mat &img)
+uint32_t ImageLoader::loadImage(unsigned i_imgSize, char *p_imgData, Mat &img)
 {
     vector<char> imgData(i_imgSize);
     memcpy(imgData.data(), p_imgData, i_imgSize);

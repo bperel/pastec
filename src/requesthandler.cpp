@@ -22,11 +22,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-#ifndef __APPLE__
-#include <jsoncpp/json/json.h>
-#else
 #include <json/json.h>
-#endif
 
 #include <messages.h>
 #include <featureextractor.h>
@@ -146,7 +142,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_image)
         && conInfo.connectionType == PUT)
     {
-        u_int32_t i_imageId = atoi(parsedURI[2].c_str());
+        uint32_t i_imageId = atoi(parsedURI[2].c_str());
 
         ORBProcess *imageProcess = featureExtractor->processNewImage(i_imageId,
                                                                                             conInfo.uploadedData.size(),
@@ -182,30 +178,30 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_image)
              && conInfo.connectionType == DELETE)
     {
-        u_int32_t i_imageId = atoi(parsedURI[2].c_str());
+        uint32_t i_imageId = atoi(parsedURI[2].c_str());
 
-        u_int32_t i_ret = index->removeImage(i_imageId);
+        uint32_t i_ret = index->removeImage(i_imageId);
         ret["type"] = Converter::codeToString(i_ret);
         ret["image_id"] = Json::Value(i_imageId);
     }
     else if (testURIWithPattern(parsedURI, p_tag)
              && conInfo.connectionType == PUT)
     {
-        u_int32_t i_imageId = atoi(parsedURI[2].c_str());
+        uint32_t i_imageId = atoi(parsedURI[2].c_str());
 
         string dataStr(conInfo.uploadedData.begin(),
                        conInfo.uploadedData.end());
 
-        u_int32_t i_ret = index->addTag(i_imageId, dataStr);
+        uint32_t i_ret = index->addTag(i_imageId, dataStr);
 
         ret["type"] = Converter::codeToString(i_ret);
     }
     else if (testURIWithPattern(parsedURI, p_tag)
              && conInfo.connectionType == DELETE)
     {
-        u_int32_t i_imageId = atoi(parsedURI[2].c_str());
+        uint32_t i_imageId = atoi(parsedURI[2].c_str());
 
-        u_int32_t i_ret = index->removeTag(i_imageId);
+        uint32_t i_ret = index->removeTag(i_imageId);
 
         ret["type"] = Converter::codeToString(i_ret);
     }
@@ -246,7 +242,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
             inputImageProcess = * featureExtractor->processImage(
                     conInfo.uploadedData.size(), conInfo.uploadedData.data());
         }
-        u_int32_t i_ret = imageSearcher->searchImage(req, &inputImageProcess);
+        uint32_t i_ret = imageSearcher->searchImage(req, &inputImageProcess);
 
         if (i_ret == IMAGE_NOT_DECODED)
         {
@@ -312,7 +308,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
 
         req.imageId = atoi(parsedURI[2].c_str());
         req.client = NULL;
-        u_int32_t i_ret = imageSearcher->searchSimilar(req);
+        uint32_t i_ret = imageSearcher->searchSimilar(req);
 
         ret["type"] = Converter::codeToString(i_ret);
 
@@ -356,7 +352,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
                        conInfo.uploadedData.end());
 
         Json::Value data = StringToJson(dataStr);
-        u_int32_t i_ret;
+        uint32_t i_ret;
         if (data["type"] == "LOAD")
             i_ret = index->load(data["index_path"].asString());
         else if (data["type"] == "WRITE")
@@ -375,8 +371,8 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
     else if (testURIWithPattern(parsedURI, p_imageIds)
              && conInfo.connectionType == GET)
     {
-        vector<u_int32_t> imageIds;
-        u_int32_t i_ret = index->getImageIds(imageIds);
+        vector<uint32_t> imageIds;
+        uint32_t i_ret = index->getImageIds(imageIds);
 
         ret["type"] = Converter::codeToString(i_ret);
 
@@ -393,7 +389,7 @@ void RequestHandler::handleRequest(ConnectionInfo &conInfo)
                        conInfo.uploadedData.end());
 
         Json::Value data = StringToJson(dataStr);
-        u_int32_t i_ret;
+        uint32_t i_ret;
         if (data["type"] == "PING")
         {
             cout << currentDate() << "Ping received." << endl;

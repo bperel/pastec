@@ -35,10 +35,10 @@ public:
     ORBProcess();
     ORBProcess(vector<KeyPoint> keypoints, Mat descriptors);
 
-    u_int32_t i_imageId;
+    uint32_t i_imageId;
     vector<KeyPoint> keypoints;
     Mat descriptors;
-    u_int32_t resultStatus;
+    uint32_t resultStatus;
 };
 
 #endif // PASTEC_ORBPROCESS_H
