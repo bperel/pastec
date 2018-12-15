@@ -45,9 +45,7 @@ u_int32_t ImageLoader::loadImage(unsigned i_imgSize, char *p_imgData, Mat &img)
         return IMAGE_NOT_DECODED;
     }
 
-    if (!img.data)
-    {
-        cout << currentDate() << "Error reading the image." << std::endl;
+    if (!img.data) {
         return IMAGE_NOT_DECODED;
     }
 
