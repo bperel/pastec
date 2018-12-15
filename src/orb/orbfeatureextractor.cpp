@@ -39,7 +39,7 @@
 
 
 ORBFeatureExtractor::ORBFeatureExtractor(ORBIndex *index, ORBWordIndex *wordIndex)
-    : index(index), wordIndex(wordIndex)
+    : index(index), wordIndex(wordIndex), orb(ORB::create(2000, 1.02, 100))
 { }
 
 ORBProcess * ORBFeatureExtractor::processImage(unsigned i_imgSize, char *p_imgData)
@@ -51,7 +51,6 @@ ORBProcess * ORBFeatureExtractor::processImage(unsigned i_imgSize, char *p_imgDa
     if (currentImageProcess->resultStatus == OK) {
         //equalizeHist( img, img );
 
-        cv::Ptr<cv::ORB> orb = cv::ORB::create(2000, 1.02, 100);
         orb->detectAndCompute(img, noArray(), currentImageProcess->keypoints, currentImageProcess->descriptors);
     }
 

@@ -47,7 +47,7 @@ using namespace std::tr1;
 #endif
 
 ORBSearcher::ORBSearcher(ORBIndex *index, ORBWordIndex *wordIndex)
-    : index(index), wordIndex(wordIndex)
+    : index(index), wordIndex(wordIndex), orb(ORB::create(2000, 1.02, 100))
 { }
 
 
