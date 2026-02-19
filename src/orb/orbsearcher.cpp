@@ -137,10 +137,9 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
                                        : i_nbTotalIndexedImages;
 
     std::unordered_map<u_int32_t, list<Hit> > imageReqHits; // key: visual word, value: the found angles
+    #define NB_NEIGHBORS 1
     for (unsigned i = 0; i < keypoints.size(); ++i)
     {
-        #define NB_NEIGHBORS 1
-
         vector<int> indices(NB_NEIGHBORS);
         vector<int> dists(NB_NEIGHBORS);
         wordIndex->knnSearch(descriptors.row(i), indices,
@@ -149,6 +148,11 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
         for (unsigned j = 0; j < indices.size(); ++j)
         {
             const unsigned i_wordId = indices[j];
+            const int dist = dists[j];
+
+            // Reject weak matches: Hamming distance threshold (80 for 256-bit ORB)
+            if (dist > 80)
+                continue;
 
             if (index->getWordNbOccurences(i_wordId) > i_maxNbOccurences)
                 continue;

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.5)
 project(Pastec)
 
 include_directories(include include/orb)
@@ -45,6 +45,8 @@ find_package(OpenCV REQUIRED)
 find_package(microhttpd REQUIRED)
 find_package(jsoncpp REQUIRED)
 find_package(CURL REQUIRED)
+
+include_directories(${LIBMICROHTTPD_INCLUDE_DIRS} ${LIBJSONCPP_INCLUDE_DIRS})
 
 add_executable(pastec ${SOURCES} ${HEADERS})
 

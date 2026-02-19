@@ -137,9 +137,9 @@ int HTTPServer::stop()
 }
 
 
-int HTTPServer::sendAnswer(struct MHD_Connection *connection, ConnectionInfo &conInfo)
+MHD_Result HTTPServer::sendAnswer(struct MHD_Connection *connection, ConnectionInfo &conInfo)
 {
-    int ret;
+    MHD_Result ret;
     struct MHD_Response *response;
 
     const char *buffer = conInfo.answerString.c_str();
@@ -175,7 +175,7 @@ void HTTPServer::requestCompleted(void *cls, MHD_Connection *connection,
 }
 
 
-int HTTPServer::answerToConnection(void *cls, MHD_Connection *connection,
+MHD_Result HTTPServer::answerToConnection(void *cls, MHD_Connection *connection,
                                    const char *url, const char *method,
                                    const char *version, const char *upload_data,
                                    size_t *upload_data_size, void **conCls)
@@ -233,7 +233,7 @@ int HTTPServer::answerToConnection(void *cls, MHD_Connection *connection,
 }
 
 
-int HTTPServer::readAuthHeader(void *cls, enum MHD_ValueKind kind,
+MHD_Result HTTPServer::readAuthHeader(void *cls, enum MHD_ValueKind kind,
                                const char *key, const char *value)
 {
     (void) kind;
