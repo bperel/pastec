@@ -14,23 +14,45 @@ def main():
                  'Couv_163996.jpg': 'Couv_163996.jpg', 's-l1200.jpg': 's-l1200.jpg'}
 
     data = {}
+    status_data = {}
     configs = []
     try:
         with open(raw_file) as f:
             for line in f:
                 if not line.strip().startswith('BENCHMARK_LINE|'):
                     continue
-                parts = line.strip().split('|', 4)
+                parts = line.strip().split('|', 5)
                 if len(parts) >= 5:
-                    _, config, image, ms, _ = parts[0], parts[1], parts[2], parts[3], parts[4]
+                    _, config, image, ms, status = parts[0], parts[1], parts[2], parts[3], parts[4]
                     if config not in configs:
                         configs.append(config)
                     data[(config, image)] = int(ms)
+                    status_data[(config, image)] = status
     except FileNotFoundError:
         configs = []
         data = {}
+        status_data = {}
 
     report = []
+    report.append("## Results Summary")
+    report.append("")
+    report.append("| Configuration | $_57.PNG | 988f13...jpg | Couv_163996.jpg | s-l1200.jpg | Pass rate |")
+    report.append("|---------------|----------|--------------|-----------------|-------------|-----------|")
+    for config in configs:
+        cells = [f"**{config}**"]
+        pass_count = 0
+        for img in img_order:
+            st = status_data.get((config, img), "?")
+            if st == "PASS":
+                cells.append("✓")
+                pass_count += 1
+            elif st == "FAIL":
+                cells.append("✗")
+            else:
+                cells.append("—")
+        cells.append(f"**{pass_count}/4**")
+        report.append("| " + " | ".join(cells) + " |")
+    report.append("")
     report.append(f"## Response Times (avg of {num_runs} runs per image)")
     report.append("")
     report.append("| Configuration | $_57.PNG | 988f13...jpg | Couv_163996.jpg | s-l1200.jpg | Total |")
@@ -59,14 +81,17 @@ def main():
     except FileNotFoundError:
         content = ""
 
-    if "## Response Times" in content:
+    # Replace Results Summary and Response Times sections (up to ## Findings)
+    marker = "## Findings"
+    if marker in content:
         content = re.sub(
-            r'## Response Times.*?(?=\n## |\Z)',
-            report_text + "\n\n",
+            r'## Results Summary.*?(?=\n' + re.escape(marker) + ')',
+            report_text.rstrip() + "\n\n" + marker + "\n\n",
             content,
             count=1,
             flags=re.DOTALL
         )
+        content = content.replace(marker + "\n\n" + marker, marker, 1)
     else:
         content = content.replace("## Findings", report_text + "\n\n## Findings")
 

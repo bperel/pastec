@@ -44,7 +44,7 @@ private:
     bool readVisualWords(string fileName);
 
     Mat *words;  // The matrix that stores the visual words.
-    cvflann::HierarchicalClusteringIndex<cvflann::Hamming<unsigned char> > *kdIndex; // The kd-tree index.
+    cvflann::NNIndex<cvflann::Hamming<unsigned char> > *flannIndex;
 };
 
 #endif // PASTEC_ORBWORDINDEX_H

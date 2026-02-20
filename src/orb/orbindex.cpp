@@ -66,19 +66,16 @@ ORBIndex::~ORBIndex()
 }
 
 
-void ORBIndex::getImagesWithVisualWords(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
-                                     unordered_map<u_int32_t, vector<Hit> > &indexHitsForReq)
+void ORBIndex::getImagesWithVisualWordsRef(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
+                                           unordered_map<u_int32_t, const vector<Hit>*> &indexHitsForReq)
 {
-    pthread_rwlock_rdlock(&rwLock);
-
+    /* Caller must hold readLock. No copy - just store pointers to internal indexHits. */
     for (unordered_map<u_int32_t, list<Hit> >::const_iterator it = imagesReqHits.begin();
          it != imagesReqHits.end(); ++it)
     {
         const unsigned i_wordId = it->first;
-        indexHitsForReq[i_wordId] = indexHits[i_wordId];
+        indexHitsForReq[i_wordId] = &indexHits[i_wordId];
     }
-
-    pthread_rwlock_unlock(&rwLock);
 }
 
 

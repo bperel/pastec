@@ -11,7 +11,7 @@ set(LIBJSONCPP_DEFINITIONS ${PC_LIBJSONCPP_CFLAGS_OTHER})
 
 find_path(LIBJSONCPP_INCLUDE_DIR json/json.h
           HINTS ${PC_LIBJSONCPP_INCLUDEDIR} ${PC_LIBJSONCPP_INCLUDE_DIRS}
-          PATH_SUFFIXES json libjsoncpp)
+          PATH_SUFFIXES json libjsoncpp jsoncpp/json jsoncpp)
 
 find_library(LIBJSONCPP_LIBRARY jsoncpp
              HINTS ${PC_LIBJSONCPP_LIBDIR} ${PC_LIBJSONCPP_LIBRARY_DIRS} )

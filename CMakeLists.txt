@@ -34,7 +34,10 @@ set(HEADERS      include/thread.h
                  include/requesthandler.h)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+if(NOT DEFINED PASTEC_RERANK_POOL)
+    set(PASTEC_RERANK_POOL 30)
+endif()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPASTEC_RERANK_POOL=${PASTEC_RERANK_POOL} -std=c++11")
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)

@@ -63,7 +63,7 @@ class RankingThread : public Thread
 {
 public:
     RankingThread(ORBIndex *index, const unsigned i_nbTotalIndexedImages,
-                  std::unordered_map<u_int32_t, vector<Hit> > &indexHits)
+                  std::unordered_map<u_int32_t, const vector<Hit>*> &indexHits)
         : index(index), i_nbTotalIndexedImages(i_nbTotalIndexedImages),
           indexHits(indexHits) { }
 
@@ -79,7 +79,7 @@ public:
         for (deque<u_int32_t>::const_iterator it = wordIds.begin();
             it != wordIds.end(); ++it)
         {
-            const vector<Hit> &hits = indexHits[*it];
+            const vector<Hit> &hits = *indexHits[*it];
 
             const float f_weight = log((float)i_nbTotalIndexedImages / hits.size());
 
@@ -98,7 +98,7 @@ public:
 
     ORBIndex *index;
     const unsigned i_nbTotalIndexedImages;
-    std::unordered_map<u_int32_t, vector<Hit> > &indexHits;
+    std::unordered_map<u_int32_t, const vector<Hit>*> &indexHits;
     deque<u_int32_t> wordIds;
     std::unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
 };
@@ -138,6 +138,7 @@ u_int32_t ORBSearcher::searchImage(SearchRequest &request)
 
     std::unordered_map<u_int32_t, list<Hit> > imageReqHits; // key: visual word, value: the found angles
     #define NB_NEIGHBORS 1
+
     for (unsigned i = 0; i < keypoints.size(); ++i)
     {
         vector<int> indices(NB_NEIGHBORS);
@@ -214,35 +215,35 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     cout << currentDate() << imageReqHits.size() << " visual words kept for the request." << endl;
     cout << currentDate() << i_nbTotalIndexedImages << " images indexed in the index." << endl;
 
-    std::unordered_map<u_int32_t, vector<Hit> > indexHits; // key: visual word id, values: index hits.
-    indexHits.rehash(imageReqHits.size());
-    index->getImagesWithVisualWords(imageReqHits, indexHits);
+    /* No-copy: hold read lock for full search, pass pointers to index hits. */
+    index->readLock();
+
+    std::unordered_map<u_int32_t, const vector<Hit>*> indexHitsRef;
+    indexHitsRef.rehash(imageReqHits.size());
+    index->getImagesWithVisualWordsRef(imageReqHits, indexHitsRef);
 
     gettimeofday(&t[1], NULL);
     cout << currentDate() << "time: " << getTimeDiff(t[0], t[1]) << " ms." << endl;
     cout << currentDate() << "Ranking the images." << endl;
 
-    index->readLock();
     #define NB_RANKING_THREAD 4
 
-    // Map the ranking to threads.
-    unsigned i_wordsPerThread = indexHits.size() / NB_RANKING_THREAD + 1;
+    unsigned i_wordsPerThread = indexHitsRef.size() / NB_RANKING_THREAD + 1;
     RankingThread *threads[NB_RANKING_THREAD];
 
-    std::unordered_map<u_int32_t, vector<Hit> >::const_iterator it = indexHits.begin();
+    std::unordered_map<u_int32_t, const vector<Hit>*>::const_iterator it = indexHitsRef.begin();
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
     {
-        threads[i] = new RankingThread(index, i_nbTotalIndexedImages, indexHits);
+        threads[i] = new RankingThread(index, i_nbTotalIndexedImages, indexHitsRef);
 
         unsigned i_nbWords = 0;
-        for (; it != indexHits.end() && i_nbWords < i_wordsPerThread; ++it, ++i_nbWords)
+        for (; it != indexHitsRef.end() && i_nbWords < i_wordsPerThread; ++it, ++i_nbWords)
             threads[i]->addWord(it->first);
     }
 
     gettimeofday(&t[2], NULL);
     cout << currentDate() << "init threads time: " << getTimeDiff(t[1], t[2]) << " ms." << endl;
 
-    // Compute
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
         threads[i]->start();
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
@@ -251,38 +252,38 @@ u_int32_t ORBSearcher::processSimilar(SearchRequest &request,
     gettimeofday(&t[3], NULL);
     cout << currentDate() << "compute time: " << getTimeDiff(t[2], t[3]) << " ms." << endl;
 
-    // Reduce...
-    std::unordered_map<u_int32_t, float> weights; // key: image id, value: image score.
+    std::unordered_map<u_int32_t, float> weights;
     weights.rehash(i_nbTotalIndexedImages);
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
-        for (std::unordered_map<u_int32_t, float>::const_iterator it = threads[i]->weights.begin();
-            it != threads[i]->weights.end(); ++it)
-            weights[it->first] += it->second;
+        for (std::unordered_map<u_int32_t, float>::const_iterator itw = threads[i]->weights.begin();
+            itw != threads[i]->weights.end(); ++itw)
+            weights[itw->first] += itw->second;
 
     gettimeofday(&t[4], NULL);
     cout << currentDate() << "reduce time: " << getTimeDiff(t[3], t[4]) << " ms." << endl;
 
-    // Free the memory
     for (unsigned i = 0; i < NB_RANKING_THREAD; ++i)
         delete threads[i];
 
     index->unlock();
 
     priority_queue<SearchResult> rankedResults;
-    for (std::unordered_map<unsigned, float>::const_iterator it = weights.begin();
-         it != weights.end(); ++it)
+    for (std::unordered_map<unsigned, float>::const_iterator itw = weights.begin();
+         itw != weights.end(); ++itw)
     {
-        //cout << "Second: " << it->second << " First: " << it->first << endl;
-        rankedResults.push(SearchResult(it->second, it->first, Rect()));
+        rankedResults.push(SearchResult(itw->second, itw->first, Rect()));
     }
 
     gettimeofday(&t[5], NULL);
     cout << currentDate() << "rankedResult time: " << getTimeDiff(t[4], t[5]) << " ms." << endl;
-    cout << currentDate() << "Reranking 300 among " << rankedResults.size() << " images." << endl;
+    #ifndef PASTEC_RERANK_POOL
+    #define PASTEC_RERANK_POOL 30
+    #endif
+    cout << currentDate() << "Reranking " << PASTEC_RERANK_POOL << " among " << rankedResults.size() << " images." << endl;
 
     priority_queue<SearchResult> rerankedResults;
-    reranker.rerank(imageReqHits, indexHits,
-                    rankedResults, rerankedResults, 300);
+    reranker.rerank(imageReqHits, indexHitsRef,
+                    rankedResults, rerankedResults, PASTEC_RERANK_POOL);
 
     gettimeofday(&t[6], NULL);
     cout << currentDate() << "time: " << getTimeDiff(t[5], t[6]) << " ms." << endl;

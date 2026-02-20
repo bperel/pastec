@@ -66,39 +66,33 @@ void *RANSACThread::run()
 
 
 void ImageReranker::rerank(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
-                           unordered_map<u_int32_t, vector<Hit> > &indexHits,
+                           unordered_map<u_int32_t, const vector<Hit>*> &indexHits,
                            priority_queue<SearchResult> &rankedResultsIn,
                            priority_queue<SearchResult> &rankedResultsOut,
                            unsigned i_nbResults)
 {
     unordered_set<u_int32_t> firstImageIds;
 
-    // Extract the first i_nbResults ranked images.
     getFirstImageIds(rankedResultsIn, i_nbResults, firstImageIds);
 
     unordered_map<u_int32_t, RANSACTask> imgTasks;
-
-    // Compute the histograms.
-    unordered_map<u_int32_t, Histogram> histograms; // key: the image id, value: the corresponding histogram.
+    unordered_map<u_int32_t, Histogram> histograms;
 
     for (unordered_map<u_int32_t, list<Hit> >::const_iterator it = imagesReqHits.begin();
          it != imagesReqHits.end(); ++it)
     {
-        // Try to match all the visual words of the request image.
         const unsigned i_wordId = it->first;
         const list<Hit> &hits = it->second;
 
         assert(hits.size() == 1);
 
-        // If there is several hits for the same word in the image...
         const u_int16_t i_angle1 = hits.front().i_angle;
         const Point2f point1(hits.front().x, hits.front().y);
-        const vector<Hit> &hitIndex = indexHits[i_wordId];
+        const vector<Hit> &hitIndex = *indexHits[i_wordId];
 
         for (unsigned i = 0; i < hitIndex.size(); ++i)
         {
             const u_int32_t i_imageId = hitIndex[i].i_imageId;
-            // Test if the image belongs to the image to rerank.
             if (firstImageIds.find(i_imageId) != firstImageIds.end())
             {
                 const u_int16_t i_angle2 = hitIndex[i].i_angle;
@@ -127,7 +121,6 @@ void ImageReranker::rerank(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
     for (unsigned i = 0; i < NB_RANSAC_THREAD; ++i)
         threads[i] = new RANSACThread(mutex, imgTasks, rankedResultsOut);
 
-    // Rank the images according to their histogram.
     unsigned i = 0;
     for (unordered_map<unsigned, Histogram>::iterator it = histograms.begin();
          it != histograms.end(); ++it, ++i)
@@ -138,7 +131,6 @@ void ImageReranker::rerank(unordered_map<u_int32_t, list<Hit> > &imagesReqHits,
         threads[i % NB_RANSAC_THREAD]->histograms.push_back(histogram);
     }
 
-    // Compute
     for (unsigned i = 0; i < NB_RANSAC_THREAD; ++i)
         threads[i]->start();
     for (unsigned i = 0; i < NB_RANSAC_THREAD; ++i)

@@ -1,0 +1,20 @@
+# Build artifacts
+build/
+*.o
+*.a
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Large index files (mount at runtime) — keep bundled visual words
+*.dat
+!data/visualWordsORB.dat
+
+# Docs and misc
+*.md
+!README.md
