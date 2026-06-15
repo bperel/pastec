@@ -1,0 +1,6 @@
+# name port
+# Each container is assumed running and accessible on localhost at the given port
+pastec 4212
+pastec-improved 4213
+pastec-o3 4215
+kp1000-flann200 4220

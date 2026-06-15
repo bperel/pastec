@@ -1,0 +1,3 @@
+results/*.ndjson
+results/*.jpg
+results/image_files.txt

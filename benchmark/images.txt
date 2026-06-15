@@ -1,0 +1,4 @@
+# One image URL per line
+https://res.cloudinary.com/dl7hskxab/image/upload/inducks-covers/webusers/webusers/2018/07/fr_aljm_011a_001.jpg
+https://res.cloudinary.com/dl7hskxab/image/upload/inducks-covers/webusers/webusers/2014/02/fr_tp_0024a_001.jpg
+https://res.cloudinary.com/dl7hskxab/image/upload/inducks-covers/webusers/webusers/2011/01/fr_tp_0013a_001.jpg
